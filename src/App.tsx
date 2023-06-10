@@ -8,9 +8,19 @@ interface THREEProps {
 
 const createBox = (scene: THREE.Scene) => {
 	const geo = new THREE.BoxGeometry(1, 1, 1);
-	const mat = new THREE.MeshBasicMaterial({ color: 'green' });
+	const mat = new THREE.MeshBasicMaterial({ color: 'white' });
 	const mesh = new THREE.Mesh(geo, mat);
 	scene.add(mesh);
+	renderedMeshes.push(mesh);
+	return mesh;
+};
+
+const createSphere = (scene: THREE.Scene) => {
+	const geo = new THREE.SphereGeometry(1.5, 50, 50);
+	const mat = new THREE.MeshBasicMaterial({ color: 'white' });
+	const mesh = new THREE.Mesh(geo, mat);
+	scene.add(mesh);
+	mesh.position.y = 0;
 	renderedMeshes.push(mesh);
 	return mesh;
 };
@@ -33,10 +43,12 @@ const THREEScene: FunctionComponent<THREEProps> = (props) => {
 			antialias: true
 		});
 		const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+		const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+		scene.add(ambientLight);
+
 		camera.position.z = 5;
 		renderer.setSize(window.innerWidth, window.innerHeight);
-		renderer.setClearColor('darkgrey');
-		createBox(scene);
+		createSphere(scene);
 		requestAnimationFrame(() => render(renderer, scene, camera));
 	});
 
