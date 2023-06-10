@@ -1,19 +1,15 @@
 import React, { useRef } from 'react';
-import { extend, useFrame, useThree } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { ShaderMaterial } from 'three';
-
-extend({ ShaderMaterial });
 
 export const CloudsShaderMaterial: React.FC = () => {
 	const materialRef = useRef<ShaderMaterial>(null);
 
 	const { clock } = useThree();
 
-	// Use the useFrame hook to update the shader material
 	useFrame(() => {
 		const material = materialRef.current;
 		if (material) {
-			// Update the time uniform to animate the clouds
 			material.uniforms.uTime.value = clock.elapsedTime;
 		}
 	});
