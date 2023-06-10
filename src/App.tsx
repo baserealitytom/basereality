@@ -8,9 +8,8 @@ interface THREEProps {
 
 const createBox = (scene: THREE.Scene) => {
 	const geo = new THREE.BoxGeometry(1, 1, 1);
-	const mat = new THREE.MeshBasicMaterial({ color: 'white' });
+	const mat = new THREE.MeshBasicMaterial({ color: 'green' });
 	const mesh = new THREE.Mesh(geo, mat);
-	mesh.scale.set(10, 10, 10);
 	scene.add(mesh);
 	renderedMeshes.push(mesh);
 	return mesh;
@@ -23,6 +22,7 @@ const THREEScene: FunctionComponent<THREEProps> = (props) => {
 
 	const render = (renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.PerspectiveCamera) => {
 		renderer.render(scene, camera);
+		renderedMeshes.forEach(mesh => mesh.rotation.y += 0.1);
 		requestAnimationFrame(() => render(renderer, scene, camera));
 	};
 
@@ -30,22 +30,33 @@ const THREEScene: FunctionComponent<THREEProps> = (props) => {
 		const scene = new THREE.Scene();
 		const renderer = new THREE.WebGLRenderer({
 			canvas: canvasRef.current,
-			antialias: false
+			antialias: true
 		});
-		const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+		const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+		camera.position.z = 5;
 		renderer.setSize(window.innerWidth, window.innerHeight);
+		renderer.setClearColor('darkgrey');
 		createBox(scene);
 		requestAnimationFrame(() => render(renderer, scene, camera));
 	});
 
 	return (
-		<canvas ref={canvasRef} width={'100%'} height={'100%'} />
+		<canvas ref={canvasRef} />
+	)
+};
+
+const Showreel = () => {
+	return (
+		<video src={'../assets/showreel.mp4'} autoPlay loop muted style={{ position: 'absolute' }}></video>
 	)
 };
 
 const App = () => {
 	return (
-		<THREEScene />
+		<div>
+			<Showreel />
+			<THREEScene />
+		</div>
 	)
 };
 
