@@ -11,8 +11,8 @@ const THREEScene: FunctionComponent<THREESceneProps> = (props) => {
 	const meshRef = useRef<THREE.Mesh>(null!);
 	//useFrame((state, delta) => (meshRef.current.rotation.x += delta));
 	return (
-		<mesh>
-			<sphereGeometry args={[15, 32, 16]} />
+		<mesh ref={meshRef}>
+			<sphereGeometry args={[5, 5, 5]} />
 			<CloudsShaderMaterial />
 		</mesh>
 	)
