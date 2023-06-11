@@ -1,5 +1,6 @@
 import './App.css';
 import React, { FunctionComponent, useEffect, useState, useRef } from 'react';
+import ShowreelVideo from './assets/showreel.mp4';
 import * as THREE from 'three';
 
 interface THREEProps {
@@ -59,7 +60,7 @@ const THREEScene: FunctionComponent<THREEProps> = (props) => {
 
 const Showreel = () => {
 	return (
-		<video src={'../assets/showreel.mp4'} autoPlay loop muted style={{ position: 'absolute' }}></video>
+		<video src={ShowreelVideo} autoPlay loop muted style={{ position: 'absolute' }}></video>
 	)
 };
 
