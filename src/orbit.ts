@@ -5,15 +5,18 @@ interface OrbitElements {
 	orbiter: THREE.Mesh
 }
 
-const updateOrbit = (props: OrbitElements) => {
-	const { time, orbiter } = props;
+interface OrbitSettings {
+	semiMajorAxis: number,
+	eccentricity: number,
+	inclination: number,
+	ascendingNode: number,
+	argumentOfPeriapsis: number,
+	orbitalPeriod: number
+}
 
-	const semiMajorAxis = 3;
-	const eccentricity = 0.2;
-	const inclination = Math.PI / 4;
-	const ascendingNode = 0;
-	const argumentOfPeriapsis = Math.PI / 2;
-	const orbitalPeriod = 20;
+const updateOrbit = (props: OrbitElements, settings: OrbitSettings) => {
+	const { time, orbiter } = props;
+	const { semiMajorAxis, eccentricity, inclination, ascendingNode, argumentOfPeriapsis, orbitalPeriod } = settings;
 	const angle = (time / 1000) * (2 * Math.PI) / orbitalPeriod;
 
 	const eccentricAnomaly = calculateEccentricAnomaly(angle, eccentricity);

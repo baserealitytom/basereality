@@ -63,11 +63,28 @@ const THREEScene: FunctionComponent = () => {
 
 		const planet = createSphere(scene);
 		const orbiter = createSphere(scene);
+		const orbiter2 = createSphere(scene);
 
-		const orbiterScale = 0.2;
+		const orbiterScale = 0.1;
 		orbiter.scale.set(orbiterScale, orbiterScale, orbiterScale);
+		orbiter2.scale.set(orbiterScale / 2, orbiterScale / 2, orbiterScale / 2);
 
-		updateFunctions.push((time: number) => updateOrbit({ orbiter, time }));
+		updateFunctions.push((time: number) => updateOrbit({ orbiter, time }, {
+			semiMajorAxis: 2,
+			eccentricity: 0.2,
+			inclination: Math.PI / 4,
+			ascendingNode: 0,
+			argumentOfPeriapsis: Math.PI / 4,
+			orbitalPeriod: 10
+		}));
+		updateFunctions.push((time: number) => updateOrbit({ orbiter: orbiter2, time }, {
+			semiMajorAxis: 2,
+			eccentricity: 0.5,
+			inclination: -Math.PI / 2,
+			ascendingNode: 0,
+			argumentOfPeriapsis: -Math.PI / 2,
+			orbitalPeriod: 10
+		}));
 
 		requestAnimationFrame((time: number) => render({ renderer, scene, camera, orbitControls }, time));
 	});
