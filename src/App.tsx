@@ -3,6 +3,7 @@ import { FunctionComponent, useEffect, useRef } from 'react';
 import ShowreelVideo from './assets/showreel.mp4';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { OrbitElements, updateOrbit } from './orbit';
 
 interface RendererElements {
 	renderer: THREE.WebGLRenderer,
@@ -12,7 +13,15 @@ interface RendererElements {
 };
 
 const createBox = (scene: THREE.Scene) => {
-	const geo = new THREE.BoxGeometry(1, 1, 1, 5, 5, 5);
+	const geo = new THREE.BoxGeometry(2, 2, 2, 5, 5, 5);
+	const mat = new THREE.MeshBasicMaterial({ color: 'white', wireframe: true });
+	const mesh = new THREE.Mesh(geo, mat);
+	scene.add(mesh);
+	return mesh;
+};
+
+const createSphere = (scene: THREE.Scene) => {
+	const geo = new THREE.SphereGeometry(1, 15, 15);
 	const mat = new THREE.MeshBasicMaterial({ color: 'white', wireframe: true });
 	const mesh = new THREE.Mesh(geo, mat);
 	scene.add(mesh);
@@ -21,12 +30,14 @@ const createBox = (scene: THREE.Scene) => {
 
 const THREEScene: FunctionComponent = () => {
 	const canvasRef = useRef<HTMLCanvasElement>(null!);
+	const updateFunctions: ((time: number) => void)[] = [];
 
-	const render = (props: RendererElements) => {
+	const render = (props: RendererElements, time: number) => {
 		const { renderer, scene, camera, orbitControls } = props;
 		orbitControls.update();
 		renderer.render(scene, camera);
-		requestAnimationFrame(() => render(props));
+		updateFunctions.map(update => update(time));
+		requestAnimationFrame((time: number) => render(props, time));
 	};
 
 	useEffect(() => {
@@ -42,13 +53,23 @@ const THREEScene: FunctionComponent = () => {
 		const orbitControls = new OrbitControls(camera, renderer.domElement);
 		orbitControls.autoRotate = true;
 		orbitControls.autoRotateSpeed = 1;
-		orbitControls.enableDamping = true;
+		//orbitControls.enableDamping = true;
+		//orbitControls.enableZoom = false;
+		//orbitControls.enablePan = false;
 		orbitControls.update();
 
 		camera.position.z = 5;
 		renderer.setSize(window.innerWidth, window.innerHeight);
-		createBox(scene);
-		requestAnimationFrame(() => render({ renderer, scene, camera, orbitControls }));
+
+		const planet = createSphere(scene);
+		const orbiter = createSphere(scene);
+
+		const orbiterScale = 0.2;
+		orbiter.scale.set(orbiterScale, orbiterScale, orbiterScale);
+
+		updateFunctions.push((time: number) => updateOrbit({ orbiter, time }));
+
+		requestAnimationFrame((time: number) => render({ renderer, scene, camera, orbitControls }, time));
 	});
 
 	return (
@@ -64,9 +85,7 @@ const Showreel = () => {
 
 const App = () => {
 	return (
-		<>
-			<THREEScene />
-		</>
+		<THREEScene />
 	)
 };
 
