@@ -52,7 +52,7 @@ const THREEScene: FunctionComponent = () => {
 
 		const orbitControls = new OrbitControls(camera, renderer.domElement);
 		orbitControls.autoRotate = true;
-		orbitControls.autoRotateSpeed = 1;
+		orbitControls.autoRotateSpeed = 25;
 		orbitControls.enableDamping = true;
 		orbitControls.enableZoom = false;
 		orbitControls.enablePan = false;
@@ -61,13 +61,15 @@ const THREEScene: FunctionComponent = () => {
 		camera.position.z = 5;
 		renderer.setSize(window.innerWidth, window.innerHeight);
 
-		const planet = createSphere(scene);
+		createSphere(scene);
 		const orbiter = createSphere(scene);
 		const orbiter2 = createSphere(scene);
+		const orbiter3 = createSphere(scene);
 
 		const orbiterScale = 0.1;
 		orbiter.scale.set(orbiterScale, orbiterScale, orbiterScale);
 		orbiter2.scale.set(orbiterScale / 2, orbiterScale / 2, orbiterScale / 2);
+		orbiter3.scale.set(orbiterScale / 2, orbiterScale / 2, orbiterScale / 2);
 
 		updateFunctions.push((time: number) => updateOrbit({ orbiter, time }, {
 			semiMajorAxis: 2,
@@ -75,15 +77,25 @@ const THREEScene: FunctionComponent = () => {
 			inclination: Math.PI / 4,
 			ascendingNode: 0,
 			argumentOfPeriapsis: Math.PI / 4,
-			orbitalPeriod: 10
+			orbitalPeriod: 2
 		}));
+
 		updateFunctions.push((time: number) => updateOrbit({ orbiter: orbiter2, time }, {
 			semiMajorAxis: 2,
-			eccentricity: 0.5,
+			eccentricity: 0.2,
+			inclination: Math.PI / 2,
+			ascendingNode: 0,
+			argumentOfPeriapsis: -Math.PI / 2,
+			orbitalPeriod: 3
+		}));
+
+		updateFunctions.push((time: number) => updateOrbit({ orbiter: orbiter3, time }, {
+			semiMajorAxis: 2,
+			eccentricity: 0.2,
 			inclination: -Math.PI / 2,
 			ascendingNode: 0,
 			argumentOfPeriapsis: -Math.PI / 2,
-			orbitalPeriod: 10
+			orbitalPeriod: 9
 		}));
 
 		requestAnimationFrame((time: number) => render({ renderer, scene, camera, orbitControls }, time));
