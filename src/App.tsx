@@ -53,9 +53,9 @@ const THREEScene: FunctionComponent = () => {
 		const orbitControls = new OrbitControls(camera, renderer.domElement);
 		orbitControls.autoRotate = true;
 		orbitControls.autoRotateSpeed = 1;
-		//orbitControls.enableDamping = true;
-		//orbitControls.enableZoom = false;
-		//orbitControls.enablePan = false;
+		orbitControls.enableDamping = true;
+		orbitControls.enableZoom = false;
+		orbitControls.enablePan = false;
 		orbitControls.update();
 
 		camera.position.z = 5;

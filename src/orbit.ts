@@ -8,8 +8,8 @@ interface OrbitElements {
 const updateOrbit = (props: OrbitElements) => {
 	const { time, orbiter } = props;
 
-	const semiMajorAxis = 4;
-	const eccentricity = 0.01;
+	const semiMajorAxis = 3;
+	const eccentricity = 0.2;
 	const inclination = Math.PI / 4;
 	const ascendingNode = 0;
 	const argumentOfPeriapsis = Math.PI / 2;
