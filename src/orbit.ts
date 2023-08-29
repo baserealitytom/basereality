@@ -1,4 +1,4 @@
-export { type OrbitElements, updateOrbit };
+export { updateOrbit };
 
 interface OrbitElements {
 	time: number,

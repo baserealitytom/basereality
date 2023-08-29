@@ -3,7 +3,10 @@ import { FunctionComponent, useEffect, useRef } from 'react';
 import ShowreelVideo from './assets/showreel.mp4';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { OrbitElements, updateOrbit } from './orbit';
+import { updateOrbit } from './orbit';
+import { fragmentShader, vertexShader } from './shader';
+import cloudPNG from './assets/cloud.png';
+import lavatileJPG from './assets/lavatile.jpg';
 
 interface RendererElements {
 	renderer: THREE.WebGLRenderer,
@@ -12,19 +15,43 @@ interface RendererElements {
 	orbitControls: OrbitControls
 };
 
-const createBox = (scene: THREE.Scene) => {
-	const geo = new THREE.BoxGeometry(2, 2, 2, 5, 5, 5);
+const textureLoader = new THREE.TextureLoader();
+
+const cloudTexture = textureLoader.load(cloudPNG);
+const lavaTexture = textureLoader.load(lavatileJPG);
+
+lavaTexture.colorSpace = THREE.SRGBColorSpace;
+
+cloudTexture.wrapS = cloudTexture.wrapT = THREE.RepeatWrapping;
+lavaTexture.wrapS = lavaTexture.wrapT = THREE.RepeatWrapping;
+
+const uniforms = {
+	'fogDensity': { value: 0.45 },
+	'fogColor': { value: new THREE.Vector3(0, 0, 0) },
+	'time': { value: 1.0 },
+	'uvScale': { value: new THREE.Vector2(3.0, 1.0) },
+	'texture1': { value: cloudTexture },
+	'texture2': { value: lavaTexture }
+};
+
+const createSphere = (parent: THREE.Group) => {
+	const geo = new THREE.SphereGeometry(1, 30, 30);
 	const mat = new THREE.MeshBasicMaterial({ color: 'white', wireframe: true });
 	const mesh = new THREE.Mesh(geo, mat);
-	scene.add(mesh);
+	parent.add(mesh);
 	return mesh;
 };
 
-const createSphere = (scene: THREE.Scene) => {
-	const geo = new THREE.SphereGeometry(1, 15, 15);
-	const mat = new THREE.MeshBasicMaterial({ color: 'white', wireframe: true });
+const createPlanet = (parent: THREE.Group) => {
+	const geo = new THREE.SphereGeometry(1, 30, 30);
+
+	const mat = new THREE.ShaderMaterial({
+		uniforms: uniforms,
+		vertexShader: vertexShader,
+		fragmentShader: fragmentShader
+	});
 	const mesh = new THREE.Mesh(geo, mat);
-	scene.add(mesh);
+	parent.add(mesh);
 	return mesh;
 };
 
@@ -32,11 +59,16 @@ const THREEScene: FunctionComponent = () => {
 	const canvasRef = useRef<HTMLCanvasElement>(null!);
 	const updateFunctions: ((time: number) => void)[] = [];
 
+	const clock = new THREE.Clock();
+
 	const render = (props: RendererElements, time: number) => {
 		const { renderer, scene, camera, orbitControls } = props;
 		orbitControls.update();
 		renderer.render(scene, camera);
 		updateFunctions.map(update => update(time));
+
+		const delta = 5 * clock.getDelta();
+		uniforms['time'].value += 0.2 * delta;
 		requestAnimationFrame((time: number) => render(props, time));
 	};
 
@@ -47,58 +79,63 @@ const THREEScene: FunctionComponent = () => {
 			antialias: true
 		});
 		const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-		const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
-		scene.add(ambientLight);
 
 		const orbitControls = new OrbitControls(camera, renderer.domElement);
+
 		orbitControls.autoRotate = true;
-		orbitControls.autoRotateSpeed = 25;
+		orbitControls.autoRotateSpeed = 2;
 		orbitControls.enableDamping = true;
-		orbitControls.enableZoom = false;
-		orbitControls.enablePan = false;
-		orbitControls.update();
 
 		camera.position.z = 5;
 		renderer.setSize(window.innerWidth, window.innerHeight);
 
-		createSphere(scene);
-		const orbiter = createSphere(scene);
-		const orbiter2 = createSphere(scene);
-		const orbiter3 = createSphere(scene);
+		const orbitGroup = new THREE.Group();
+		scene.add(orbitGroup);
 
-		const orbiterScale = 0.1;
+		createPlanet(orbitGroup);
+		const orbiter = createSphere(orbitGroup);
+		const orbiter2 = createSphere(orbitGroup);
+		const orbiter3 = createSphere(orbitGroup);
+
+		const orbiterScale = 0.05;
 		orbiter.scale.set(orbiterScale, orbiterScale, orbiterScale);
 		orbiter2.scale.set(orbiterScale / 2, orbiterScale / 2, orbiterScale / 2);
 		orbiter3.scale.set(orbiterScale / 2, orbiterScale / 2, orbiterScale / 2);
 
 		updateFunctions.push((time: number) => updateOrbit({ orbiter, time }, {
 			semiMajorAxis: 2,
-			eccentricity: 0.2,
+			eccentricity: 0.5,
 			inclination: Math.PI / 4,
 			ascendingNode: 0,
-			argumentOfPeriapsis: Math.PI / 4,
-			orbitalPeriod: 2
+			argumentOfPeriapsis: Math.PI / 2,
+			orbitalPeriod: 3
 		}));
 
 		updateFunctions.push((time: number) => updateOrbit({ orbiter: orbiter2, time }, {
 			semiMajorAxis: 2,
-			eccentricity: 0.2,
-			inclination: Math.PI / 2,
+			eccentricity: 0.1,
+			inclination: Math.PI / 4,
 			ascendingNode: 0,
-			argumentOfPeriapsis: -Math.PI / 2,
-			orbitalPeriod: 3
+			argumentOfPeriapsis: Math.PI * 2,
+			orbitalPeriod: 8
 		}));
 
 		updateFunctions.push((time: number) => updateOrbit({ orbiter: orbiter3, time }, {
 			semiMajorAxis: 2,
-			eccentricity: 0.2,
-			inclination: -Math.PI / 2,
+			eccentricity: 0.5,
+			inclination: Math.PI / 4,
 			ascendingNode: 0,
-			argumentOfPeriapsis: -Math.PI / 2,
-			orbitalPeriod: 9
+			argumentOfPeriapsis: Math.PI,
+			orbitalPeriod: 5
 		}));
 
 		requestAnimationFrame((time: number) => render({ renderer, scene, camera, orbitControls }, time));
+
+		window.addEventListener('resize', () => {
+			canvasRef.current.width = window.innerWidth;
+			canvasRef.current.height = window.innerHeight;
+			renderer.setSize(window.innerWidth, window.innerHeight);
+		});
 	});
 
 	return (
