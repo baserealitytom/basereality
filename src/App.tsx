@@ -26,7 +26,7 @@ cloudTexture.wrapS = cloudTexture.wrapT = THREE.RepeatWrapping;
 lavaTexture.wrapS = lavaTexture.wrapT = THREE.RepeatWrapping;
 
 const uniforms = {
-	'fogDensity': { value: 0.45 },
+	'fogDensity': { value: 0.05 },
 	'fogColor': { value: new THREE.Vector3(0, 0, 0) },
 	'time': { value: 1.0 },
 	'uvScale': { value: new THREE.Vector2(3.0, 1.0) },
@@ -68,7 +68,7 @@ const THREEScene: FunctionComponent = () => {
 		updateFunctions.map(update => update(time));
 
 		const delta = 5 * clock.getDelta();
-		uniforms['time'].value += 0.2 * delta;
+		uniforms['time'].value += 0.15 * delta;
 		requestAnimationFrame((time: number) => render(props, time));
 	};
 
@@ -97,18 +97,18 @@ const THREEScene: FunctionComponent = () => {
 		const orbiter2 = createSphere(orbitGroup);
 		const orbiter3 = createSphere(orbitGroup);
 
-		const orbiterScale = 0.05;
+		const orbiterScale = 0.15;
 		orbiter.scale.set(orbiterScale, orbiterScale, orbiterScale);
 		orbiter2.scale.set(orbiterScale / 2, orbiterScale / 2, orbiterScale / 2);
-		orbiter3.scale.set(orbiterScale / 2, orbiterScale / 2, orbiterScale / 2);
+		orbiter3.scale.set(orbiterScale / 3, orbiterScale / 3, orbiterScale / 3);
 
 		updateFunctions.push((time: number) => updateOrbit({ orbiter, time }, {
 			semiMajorAxis: 2,
-			eccentricity: 0.5,
-			inclination: Math.PI / 4,
+			eccentricity: 0.1,
+			inclination: -Math.PI / 2,
 			ascendingNode: 0,
-			argumentOfPeriapsis: Math.PI / 2,
-			orbitalPeriod: 3
+			argumentOfPeriapsis: -Math.PI / 2,
+			orbitalPeriod: 10
 		}));
 
 		updateFunctions.push((time: number) => updateOrbit({ orbiter: orbiter2, time }, {
@@ -116,17 +116,17 @@ const THREEScene: FunctionComponent = () => {
 			eccentricity: 0.1,
 			inclination: Math.PI / 4,
 			ascendingNode: 0,
-			argumentOfPeriapsis: Math.PI * 2,
+			argumentOfPeriapsis: Math.PI / 2,
 			orbitalPeriod: 8
 		}));
 
 		updateFunctions.push((time: number) => updateOrbit({ orbiter: orbiter3, time }, {
 			semiMajorAxis: 2,
-			eccentricity: 0.5,
+			eccentricity: 0.1,
 			inclination: Math.PI / 4,
 			ascendingNode: 0,
-			argumentOfPeriapsis: Math.PI,
-			orbitalPeriod: 5
+			argumentOfPeriapsis: -Math.PI / 4,
+			orbitalPeriod: 12
 		}));
 
 		requestAnimationFrame((time: number) => render({ renderer, scene, camera, orbitControls }, time));
